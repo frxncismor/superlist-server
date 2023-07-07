@@ -8,5 +8,21 @@
     "express": "^4.18.2",
     "googleapis": "^105.0.0",
     "nodemon": "^2.0.22"
-  }
+  },
+  "name": "super-list-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frxncismor/superlist-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frxncismor/superlist-server/issues"
+  },
+  "homepage": "https://github.com/frxncismor/superlist-server#readme",
+  "description": ""
 }
