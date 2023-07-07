@@ -6,7 +6,7 @@ const {google} = require('googleapis');
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
-
+const spreadsheetid = '1t8_iVIzhMXnwtgGGA2I89SHdw6ElWQXs9m4w-jGkj8A';
 app.use(express.json());
 
 app.get('/api/getList', (req, res) => {
@@ -107,7 +107,7 @@ async function authorize() {
 async function getList(auth) {
   const sheets = google.sheets({version: 'v4', auth});
   const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: process.env.SPREADSHEETID,
+    spreadsheetId: spreadsheetid,
     range: "'Ingredientes Totales Quincenales'!A3:G28",
   });
   let ingredientList = [];
@@ -136,7 +136,7 @@ async function updateCost(newValue, cost_cell) {
   const authClient = await authorize();
   const sheets = google.sheets('v4', authClient);
   const request = {
-    spreadsheetId: process.env.SPREADSHEETID,
+    spreadsheetId: spreadsheetid,
     range: "'Ingredientes Totales Quincenales'!D" + cost_cell,
     valueInputOption: 'RAW',
     resource: {
