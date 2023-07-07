@@ -14,7 +14,9 @@ app.use(cors());
 app.get('/api/getList', (req, res) => {
   authorize().then(async response => {
     let list = await getList(response);
-    res.json(list);
+    let generalList = await getGeneralList(response);
+    let allList = [list, generalList];
+    res.json(allList);
   }).catch(console.error);
 });
 
@@ -131,7 +133,42 @@ async function getList(auth) {
     // Print columns A and E, which correspond to indices 0 and 4.
   });
   return ingredientList;
+}
 
+/**
+ * Prints the names and majors of students in a sample spreadsheet:
+ * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+ * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
+ */
+async function getGeneralList(auth) {
+  const sheets = google.sheets({version: 'v4', auth});
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: spreadsheetid,
+    range: "'Despensa'!A3:E44",
+  });
+  let ingredientList = [];
+  const rows = res.data.values;
+  if (!rows || rows.length === 0) {
+    console.log('No data found.');
+    return;
+  }
+  // console.log(rows);
+  rows.forEach((row) => {
+    let ingredient = {
+      name: row[0],
+      need_to_buy: row[2],
+      cost: row[3],
+      cost_cell: row[4]
+    };
+    console.log(ingredient.name);
+    if (ingredient.name !== "Hogar" && ingredient.name !== "Higiene" && ingredient.name !== "Limpieza" && ingredient.name !== "Jardin" && ingredient.name !== "Mascotas") {
+      ingredientList.push(ingredient);
+    } else {
+      console.log(ingredient);
+    }
+    // Print columns A and E, which correspond to indices 0 and 4.
+  });
+  return ingredientList;
 }
 
 async function updateCost(newValue, cost_cell) {
