@@ -15,7 +15,7 @@ app.get('/api/getList', (req, res) => {
   authorize().then(async response => {
     let list = await getList(response);
     let generalList = await getGeneralList(response);
-    let allList = [list, generalList];
+    let allList = [...list, ...generalList];
     res.json(allList);
   }).catch(console.error);
 });
@@ -161,7 +161,7 @@ async function getGeneralList(auth) {
       cost_cell: row[4]
     };
     console.log(ingredient.name);
-    if (ingredient.name !== "Hogar" && ingredient.name !== "Higiene" && ingredient.name !== "Limpieza" && ingredient.name !== "Jardin" && ingredient.name !== "Mascotas") {
+    if (ingredient.name !== "Hogar" && ingredient.name !== "Higiene" && ingredient.name !== "Limpieza" && ingredient.name !== "Jardin" && ingredient.name !== "Mascotas" && ingredient.name !== "") {
       ingredientList.push(ingredient);
     } else {
       console.log(ingredient);
