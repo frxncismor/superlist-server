@@ -26,13 +26,14 @@ app.get('/api/authorize', (req, res) => {
   }).catch(console.error);
 });
 
-app.put('/api/updateCost/:value/:cell', (req, res) => {
+app.put('/api/updateCost/:sheetname/:cell/:value', (req, res) => {
   const value = req.params.value;
   const cell = req.params.cell;
+  const sheetname = req.params.sheetname;
 
   authorize()
     .then(async (response) => {
-      const updated = await updateCost(value, cell, response);
+      const updated = await updateCost(value, cell, response, sheetname);
       res.json(updated);
     })
     .catch(console.error);
@@ -127,7 +128,8 @@ async function getList(auth) {
       need_to_buy: row[5],
       measure: row[4],
       cost: row[3],
-      cost_cell: row[6]
+      cost_cell: row[6],
+      sheet_name: 'Ingredientes Totales Quincenales'
     };
     ingredientList.push(ingredient);
     // Print columns A and E, which correspond to indices 0 and 4.
@@ -157,9 +159,10 @@ async function getGeneralList(auth) {
     let ingredient = {
       name: row[0],
       need_to_buy: row[2],
-      cost: row[3],
       measure: 'ud',
-      cost_cell: row[4]
+      cost: row[3],
+      cost_cell: row[4],
+      sheet_name: 'Despensa'
     };
     console.log(ingredient.name);
     if (ingredient.name !== "Hogar" && ingredient.name !== "Higiene" && ingredient.name !== "Limpieza" && ingredient.name !== "Jardin" && ingredient.name !== "Mascotas" && ingredient.name !== "") {
@@ -172,12 +175,12 @@ async function getGeneralList(auth) {
   return ingredientList;
 }
 
-async function updateCost(newValue, cost_cell) {
+async function updateCost(newValue, cost_cell, sheet_name) {
   const authClient = await authorize();
   const sheets = google.sheets('v4', authClient);
   const request = {
     spreadsheetId: spreadsheetid,
-    range: "'Ingredientes Totales Quincenales'!D" + cost_cell,
+    range: "'" + sheet_name + "'!D" + cost_cell,
     valueInputOption: 'RAW',
     resource: {
       // TODO: Add desired properties to the request body. All existing properties
