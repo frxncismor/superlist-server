@@ -122,7 +122,7 @@ async function getList(auth) {
     console.log('No data found.');
     return;
   }
-  // console.log(rows);
+  console.log(rows);
   rows.forEach((row) => {
     let ingredient = {
       name: row[0],
@@ -132,7 +132,9 @@ async function getList(auth) {
       cost_cell: row[6],
       sheet_name: 'Ingredientes Totales Quincenales'
     };
-    ingredientList.push(ingredient);
+    if (ingredient.name !== "") {
+      ingredientList.push(ingredient);
+    }
     // Print columns A and E, which correspond to indices 0 and 4.
   });
   return ingredientList;
