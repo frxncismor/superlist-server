@@ -4,10 +4,12 @@ const process = require('process');
 const {authenticate} = require('@google-cloud/local-auth');
 const {google} = require('googleapis');
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 const spreadsheetid = '1t8_iVIzhMXnwtgGGA2I89SHdw6ElWQXs9m4w-jGkj8A';
 app.use(express.json());
+app.use(cors());
 
 app.get('/api/getList', (req, res) => {
   authorize().then(async response => {
@@ -147,7 +149,6 @@ async function updateCost(newValue, cost_cell) {
             newValue
           ]
         ]
-      
     },
     auth: authClient,
   };
