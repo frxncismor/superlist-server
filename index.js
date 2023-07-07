@@ -132,11 +132,12 @@ async function getList(auth) {
       cost_cell: row[6],
       sheet_name: 'Ingredientes Totales Quincenales'
     };
-    if (ingredient.name !== "") {
+    if (ingredient.name !== "" && ingredient.need_to_buy !== "0") {
       ingredientList.push(ingredient);
     }
     // Print columns A and E, which correspond to indices 0 and 4.
   });
+  console.log(ingredientList);
   return ingredientList;
 }
 
@@ -157,7 +158,6 @@ async function getGeneralList(auth) {
     console.log('No data found.');
     return;
   }
-  // console.log(rows);
   rows.forEach((row) => {
     let ingredient = {
       name: row[0],
@@ -167,11 +167,8 @@ async function getGeneralList(auth) {
       cost_cell: row[4],
       sheet_name: 'Despensa'
     };
-    console.log(ingredient.name);
-    if (ingredient.name !== "Hogar" && ingredient.name !== "Higiene" && ingredient.name !== "Limpieza" && ingredient.name !== "Jardin" && ingredient.name !== "Mascotas" && ingredient.name !== "") {
+    if (ingredient.name !== "Hogar" && ingredient.name !== "Higiene" && ingredient.name !== "Limpieza" && ingredient.name !== "Jardin" && ingredient.name !== "Mascotas" && ingredient.name !== "" && ingredient.need_to_buy !== "0") {
       ingredientList.push(ingredient);
-    } else {
-      console.log(ingredient);
     }
     // Print columns A and E, which correspond to indices 0 and 4.
   });
