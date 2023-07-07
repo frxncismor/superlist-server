@@ -158,6 +158,7 @@ async function getGeneralList(auth) {
       name: row[0],
       need_to_buy: row[2],
       cost: row[3],
+      measure: 'ud',
       cost_cell: row[4]
     };
     console.log(ingredient.name);
