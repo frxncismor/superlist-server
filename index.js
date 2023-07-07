@@ -31,9 +31,10 @@ app.put('/api/updateCost/:sheetname/:cell/:value', (req, res) => {
   const cell = req.params.cell;
   const sheetname = req.params.sheetname;
 
+  // console.log(value, cell, sheetname);
   authorize()
     .then(async (response) => {
-      const updated = await updateCost(value, cell, response, sheetname);
+      const updated = await updateCost(value, cell, sheetname);
       res.json(updated);
     })
     .catch(console.error);
@@ -178,9 +179,11 @@ async function getGeneralList(auth) {
 async function updateCost(newValue, cost_cell, sheet_name) {
   const authClient = await authorize();
   const sheets = google.sheets('v4', authClient);
+  console.log(sheet_name);
+  console.log( `${sheet_name}!D${cost_cell}`);
   const request = {
     spreadsheetId: spreadsheetid,
-    range: "'" + sheet_name + "'!D" + cost_cell,
+    range: `'${sheet_name}'!D${cost_cell}`,
     valueInputOption: 'RAW',
     resource: {
       // TODO: Add desired properties to the request body. All existing properties
@@ -196,6 +199,7 @@ async function updateCost(newValue, cost_cell, sheet_name) {
   try {
     const response = (await sheets.spreadsheets.values.update(request)).data;
     // TODO: Change code below to process the `response` object:
+    // console.log(response);
     return response;
   } catch (err) {
     console.error(err);
