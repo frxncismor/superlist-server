@@ -11,33 +11,20 @@ const spreadsheetid = '1t8_iVIzhMXnwtgGGA2I89SHdw6ElWQXs9m4w-jGkj8A';
 app.use(express.json());
 app.use(cors());
 
-app.get('/api/getList', (req, res) => {
-  authorize().then(async response => {
-    let list = await getList(response);
-    let generalList = await getGeneralList(response);
-    let allList = [...list, ...generalList];
-    res.json(allList);
-  }).catch(console.error);
+app.get('/api/getList', async (req, res) => {
+  let list = await getList();
+  let generalList = await getGeneralList();
+  let allList = [...list, ...generalList];
+  res.json(allList);
 });
 
-app.get('/api/authorize', (req, res) => {
-  authorize().then(async response => {
-    res.json(response);
-  }).catch(console.error);
-});
-
-app.put('/api/updateCost/:sheetname/:cell/:value', (req, res) => {
+app.put('/api/updateCost/:sheetname/:cell/:value', async (req, res) => {
   const value = req.params.value;
   const cell = req.params.cell;
   const sheetname = req.params.sheetname;
 
-  // console.log(value, cell, sheetname);
-  authorize()
-    .then(async (response) => {
-      const updated = await updateCost(value, cell, sheetname);
-      res.json(updated);
-    })
-    .catch(console.error);
+  const updated = await updateCost(value, cell, sheetname);
+  res.json(updated);
 });
 
 
@@ -57,15 +44,15 @@ const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
  *
  * @return {Promise<OAuth2Client|null>}
  */
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
-    return null;
-  }
-}
+// async function loadSavedCredentialsIfExist() {
+//   try {
+//     return google.auth.GoogleAuth({
+
+//     });
+//   } catch (err) {
+//     return null;
+//   }
+// }
 
 /**
  * Serializes credentials to a file comptible with GoogleAUth.fromJSON.
@@ -91,18 +78,53 @@ async function saveCredentials(client) {
  *
  */
 async function authorize() {
-  let client = await loadSavedCredentialsIfExist();
-  if (client) {
-    return client;
-  }
-  client = await authenticate({
-    scopes: SCOPES,
-    keyfilePath: CREDENTIALS_PATH,
+  // const auth = new google.auth.GoogleAuth({
+  //   Scopes can be specified either as an array or as a single, space-delimited string.
+  //   scopes: SCOPES
+  // });
+
+  // Acquire an auth client, and bind it to all future calls
+  // const authClient = await auth.getClient();
+  // google.options({auth: authClient});
+
+  // Do the magic
+  // const res = await sheets.spreadsheets.get({
+  //   True if grid data should be returned. This parameter is ignored if a field mask was set in the request.
+  //   includeGridData: true,
+  //   The ranges to retrieve from the spreadsheet.
+  //   ranges: "'Ingredientes Totales Quincenales'!A3:G28",
+  //   The spreadsheet to request.
+  //   spreadsheetId: spreadsheetid,
+  // });
+  // console.log(res.data);
+
+  // sheets.spreadsheets.get();
+  const sheet = google.sheets({
+    version: 'v4',
+    auth: 'AIzaSyBtxY6TY08NroKSxOQMsh2gZ-WbolKs0tg'
   });
-  if (client.credentials) {
-    await saveCredentials(client);
-  }
-  return client;
+
+  const res = sheet.spreadsheets.get({
+      // True if grid data should be returned. This parameter is ignored if a field mask was set in the request.
+      includeGridData: true,
+      // The ranges to retrieve from the spreadsheet.
+      ranges: "'Ingredientes Totales Quincenales'!A3:G28",
+      // The spreadsheet to request.
+      spreadsheetId: spreadsheetid,
+    });
+
+    console.log(res);
+    return res;
+  // if (client) {
+  //   return client;
+  // }
+  // client = await authenticate({
+  //   scopes: SCOPES
+  // });
+  // if (client.credentials) {
+  //   await saveCredentials(client);
+  // }
+  return docs;
 }
 
 /**
@@ -110,9 +132,12 @@ async function authorize() {
  * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-async function getList(auth) {
-  const sheets = google.sheets({version: 'v4', auth});
-  const res = await sheets.spreadsheets.values.get({
+async function getList() {
+  const sheet = google.sheets({
+    version: 'v4',
+    auth: 'AIzaSyBtxY6TY08NroKSxOQMsh2gZ-WbolKs0tg'
+  });
+  const res = await sheet.spreadsheets.values.get({
     spreadsheetId: spreadsheetid,
     range: "'Ingredientes Totales Quincenales'!A3:G28",
   });
@@ -147,8 +172,11 @@ async function getList(auth) {
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
 async function getGeneralList(auth) {
-  const sheets = google.sheets({version: 'v4', auth});
-  const res = await sheets.spreadsheets.values.get({
+  const sheet = google.sheets({
+    version: 'v4',
+    auth: 'AIzaSyBtxY6TY08NroKSxOQMsh2gZ-WbolKs0tg'
+  });
+  const res = await sheet.spreadsheets.values.get({
     spreadsheetId: spreadsheetid,
     range: "'Despensa'!A3:E44",
   });
@@ -176,10 +204,10 @@ async function getGeneralList(auth) {
 }
 
 async function updateCost(newValue, cost_cell, sheet_name) {
-  const authClient = await authorize();
-  const sheets = google.sheets('v4', authClient);
-  console.log(sheet_name);
-  console.log( `${sheet_name}!D${cost_cell}`);
+  const sheet = google.sheets({
+    version: 'v4',
+    auth: 'AIzaSyBtxY6TY08NroKSxOQMsh2gZ-WbolKs0tg'
+  });
   const request = {
     spreadsheetId: spreadsheetid,
     range: `'${sheet_name}'!D${cost_cell}`,
@@ -196,7 +224,7 @@ async function updateCost(newValue, cost_cell, sheet_name) {
     auth: authClient,
   };
   try {
-    const response = (await sheets.spreadsheets.values.update(request)).data;
+    const response = (await sheet.spreadsheets.values.update(request)).data;
     // TODO: Change code below to process the `response` object:
     // console.log(response);
     return response;
